@@ -35,7 +35,7 @@ df = pd.read_csv("https://raw.githubusercontent.com/guebin/DV2023/main/posts/NYC
 df_small = df[::100].reset_index(drop=True)
 ```
 
-# 기말고사1-(1),(2)
+# 기말고사1-(1),(2),(3)
 
 ```{python}
 df_feature = df.assign(
@@ -91,7 +91,6 @@ fig = px.density_heatmap(
 )
 fig.show()
 ```
-# 기말고사1-(3)
 
 ```{python}
 df_feature_small = df_feature[::100].reset_index(drop=True)
