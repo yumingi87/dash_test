@@ -10,7 +10,9 @@ execute:
 ---
 ```
 
-# (1)요일에 따른 평균속력 시각화
+# 시각화 {orientation="columns" scrolling="true"}
+
+## Column {width=50%}
 
 ```{python}
 import numpy as np
@@ -72,15 +74,14 @@ fig = px.density_heatmap(
 fig.show()
 ```
 
+## Column {width=50%}
+
 # (2)시간과 요일에 따른 평균이동거리 시각화
 
 ```{python}
 #| title: 시간과 요일에 따른 평균이동거리 시각화
 ```
 
-# 시각화 {orientation="columns" scrolling="true"}
-
-## Column {width=50%}
 
 ```{python}
 #| title: 시간과 요일에 따른 평균이동거리 시각화
@@ -102,7 +103,6 @@ fig.show()
 
 ```
 
-## Column {width=50%}
 
 ```{python}
 #| title: 속력별 경로 시각화
