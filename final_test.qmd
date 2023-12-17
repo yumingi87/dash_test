@@ -1,12 +1,11 @@
 ---
-title: "데이터 시각화 기말고사"
-author: "유민기"
+title: "NYCTaxi"
+author: "유민기(202016232)"
 format: dashboard
 execute: 
   enabled: true
   cache: false
   freeze: false
-  error: true
 ---
 
 ```{python}
@@ -34,7 +33,11 @@ df = pd.read_csv("https://raw.githubusercontent.com/guebin/DV2023/main/posts/NYC
     dayofweek = lambda df: df.pickup_datetime.dt.dayofweek
 )
 df_small = df[::100].reset_index(drop=True)
+```
 
+# 기말고사1-(1),(2)
+
+```{python}
 df_feature = df.assign(
     log_trip_duration = np.log(df.trip_duration),
     pickup_datetime = df.pickup_datetime.apply(pd.to_datetime),
@@ -69,7 +72,9 @@ fig = px.density_heatmap(
     height=300,
 )
 fig.show()
+```
 
+```{python}
 average_distance_by_hour_and_day = df.groupby(['pickup_hour', 'dayofweek'])['dist'].mean().reset_index()
 
 fig = px.density_heatmap(
@@ -85,7 +90,10 @@ fig = px.density_heatmap(
     height=300,
 )
 fig.show()
+```
+# 기말고사1-(3)
 
+```{python}
 df_feature_small = df_feature[::100].reset_index(drop=True)
 df_feature_small
 
@@ -112,9 +120,7 @@ fig = px.line_mapbox(
     center = {'lat':40.7322, 'lon':-73.9052},
     #---#
     mapbox_style = 'carto-positron',
-    zoom=10,
-    width = 750,
-    height = 600    
+    zoom=11,
 )
 scatter_data = px.scatter_mapbox(
     data_frame=tidydata,
@@ -125,9 +131,7 @@ scatter_data = px.scatter_mapbox(
     color = 'speed_cut',
     #---#
     mapbox_style = 'carto-positron',
-    zoom=10,
-    width = 750,
-    height = 600    
+    zoom=11,  
 ).data 
 for sd in scatter_data: 
     fig.add_trace(sd)
