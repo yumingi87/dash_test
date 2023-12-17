@@ -105,43 +105,57 @@ fig.show()
 ## Column {width=50%}
 
 ```{python}
-#| title: 2018~2019년도 전기사용량 (서울)
-seoul_dict = local_dict.copy() 
-seoul_dict['features'] = [l for l in seoul_dict['features'] if l['properties']['code'][:2] == '11']
-fig = px.choropleth_mapbox(
-    geojson = seoul_dict,
-    featureidkey = 'properties.code',
-    data_frame = df2,
-    locations = 'code_local',
-    color = '에너지사용량(TOE)/전기',
-    animation_frame= '년도',
-    hover_data = ['시도','지역'],
+#| title: 속력별 경로 시각화
+df_feature_small = df_feature[::100].reset_index(drop=True)
+df_feature_small
+
+pcol = ['pickup_datetime', 'pickup_longitude', 'pickup_latitude', 'pickup_hour']
+dcol = ['dropoff_datetime', 'dropoff_longitude', 'dropoff_latitude', 'dropoff_hour']
+def transform(df):
+    pickup = df.loc[:,['id']+pcol].set_axis(['id', 'datetime', 'longitude', 'latitude', 'hour'],axis=1).assign(type = 'pickup')
+    dropoff = df.loc[:,['id']+dcol].set_axis(['id', 'datetime', 'longitude', 'latitude', 'hour'],axis=1).assign(type = 'dropoff')
+    return pd.concat([pickup,dropoff],axis=0)
+df_left = df_feature_small.drop(pcol+dcol,axis=1)
+df_right = pd.concat([transform(df) for i, df in df_feature_small.groupby('id')]).reset_index(drop=True)
+df_feature_small2 = df_left.merge(df_right)
+df_feature_small2.head()
+
+tidydata = df_feature_small2.assign(
+    speed_cut = pd.qcut(df_feature_small2.speed,4, labels=['매우느림','조금느림','조금빠름','매우빠름'])
+).sort_values('speed_cut')
+fig = px.line_mapbox(
+    data_frame=tidydata,
+    lat = 'latitude',
+    lon = 'longitude',
+    line_group = 'id',
+    color = 'speed_cut',
+    center = {'lat':40.7322, 'lon':-73.9052},
     #---#
-    mapbox_style="carto-positron",
-    range_color = [0,400000],
-    center={"lat": 37.5642135, "lon": 127.0016985},
-    zoom=9,
+    mapbox_style = 'carto-positron',
+    zoom=10,
+    width = 750,
+    height = 600    
+)
+scatter_data = px.scatter_mapbox(
+    data_frame=tidydata,
+    lat = 'latitude',
+    lon = 'longitude',
+    size = 'passenger_count',
+    size_max = 10,
+    color = 'speed_cut',
+    #---#
+    mapbox_style = 'carto-positron',
+    zoom=10,
+    width = 750,
+    height = 600    
+).data 
+for sd in scatter_data: 
+    fig.add_trace(sd)
+fig.update_traces(
+    line={
+        'width':1
+    },
+    opacity=0.8
 )
 fig.show(config={'scrollZoom':False})
-```
-
-```{python}
-#| title: 2018~2019년도 에너지사용량 (전국)
-fig = df2.drop(['code_local','code'],axis=1)\
-.set_index(['년도','시도','지역','건물동수','연면적']).stack().reset_index()\
-.rename({'level_5':'에너지종류', 0:'에너지사용량'},axis=1)\
-.assign(에너지종류 = lambda df: df['에너지종류'].str.split('/').str[-1])\
-.groupby(['년도','시도','에너지종류']).agg({'에너지사용량':'sum'})\
-.stack().reset_index()\
-.rename({0:'에너지사용량'},axis=1)\
-.plot.area(
-    x='년도',y='에너지사용량',
-    color='시도',
-    facet_col='에너지종류'
-)
-fig.update_layout(
-    xaxis_domain=[0.0, 0.25],
-    xaxis2_domain=[0.35, 0.60],
-    xaxis3_domain=[0.70, 0.95]
-)
 ```
