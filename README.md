@@ -1,6 +1,4 @@
-# dash_test
+# final_tset
 
-대시보드 만들기 실습
-- 대한민국의 에너지 소비량
-- <https://yumingi87.github.io/dash_test/Energy.html>
+엥 왜 안뜨지
 
